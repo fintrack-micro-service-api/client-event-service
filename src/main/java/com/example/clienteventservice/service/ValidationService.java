@@ -3,7 +3,6 @@ package com.example.clienteventservice.service;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.util.ValidationUtil;
 import com.example.clienteventservice.domain.model.BankAccount;
-import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +32,20 @@ public class ValidationService {
         }
     }
 
-    public void validAmount(BigDecimal amount) {
-        Preconditions.checkNotNull(amount, "amount can not be null");
-        Preconditions.checkArgument(!ValidationUtil.isNegative(amount), "amount can not be negative");
-        Preconditions.checkArgument(amount.compareTo(BigDecimal.ZERO) != 0, "amount can not be zero");
+    public void validateAmount(BigDecimal amount) {
+        if (amount == null) {
+            throw new IllegalArgumentException("Amount cannot be null");
+        }
+        if (isNegative(amount)) {
+            throw new IllegalArgumentException("Amount cannot be negative");
+        }
+        if (amount.compareTo(BigDecimal.ZERO) == 0) {
+            throw new IllegalArgumentException("Amount cannot be zero");
+        }
+    }
+
+    private boolean isNegative(BigDecimal value) {
+        return value.compareTo(BigDecimal.ZERO) < 0;
     }
 
 }

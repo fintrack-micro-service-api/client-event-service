@@ -116,7 +116,7 @@ public class CustomerController {
         if (notificationType == NotificationType.TELEGRAM) {
 
             Long botId = 1L; //we use only this bot id to send notifications;
-            String getBotByIdUrl = "http://telegram-service/api/v1/telegram/bots/get-bot-by-botId";
+            String getBotByIdUrl = "http://localhost:8082/api/v1/telegram/bots/get-bot-by-botId";
             WebClient web = webClientConfig.webClientBuilder().baseUrl(getBotByIdUrl).build();
 
               TelegramCreatedBotDto telegramCreatedBotDto = web.get()
