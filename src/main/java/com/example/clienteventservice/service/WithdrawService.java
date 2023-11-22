@@ -70,7 +70,7 @@ public class WithdrawService {
                     .build();
         } catch (Exception e) {
             return ApiResponse.<Void>builder()
-                    .message("Internal Server Error")
+                    .message(e.getMessage())
                     .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .build();
         }

@@ -6,7 +6,6 @@ import com.example.clienteventservice.service.DepositService;
 import com.example.clienteventservice.service.TransactionService;
 import com.example.clienteventservice.service.TransferService;
 import com.example.clienteventservice.service.WithdrawService;
-import com.google.common.base.Preconditions;
 import io.swagger.annotations.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -39,7 +38,6 @@ public class TransactionController {
             @ApiParam(value = "The ID of the bank account") @PathVariable(name = "bankAccountId") String bankAccountNumber,
             @ApiParam(value = "The amount of the withdraw transaction") @RequestBody @Valid AmountDto amountDto) {
         LOG.info("/{} called with amount: {}", bankAccountNumber, amountDto);
-        Preconditions.checkNotNull(amountDto, "amountDto can not be null");
 
         ApiResponse<Void> withdrawResponse = withdrawService.withdraw(bankAccountNumber, amountDto.getAmount());
 

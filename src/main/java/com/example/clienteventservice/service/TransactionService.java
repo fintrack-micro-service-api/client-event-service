@@ -10,7 +10,6 @@ import com.example.clienteventservice.domain.type.TransactionType;
 import com.example.clienteventservice.event.SBAEventListener;
 import com.example.clienteventservice.exception.InsufficientBalanceManagerException;
 import com.example.clienteventservice.repository.TransactionHistoryRepository;
-import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
@@ -45,8 +44,10 @@ public class TransactionService {
 
     public void executeWithdraw(BankAccount bankAccount, BigDecimal amount) {
         // validate parameters
-        Preconditions.checkNotNull(bankAccount, "bankAccount can not be null");
-        validationService.validAmount(amount);
+        if (bankAccount == null) {
+            throw new IllegalArgumentException("bankAccount can not be null");
+        }
+        validationService.validateAmount(amount);
 
         TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder = getTransactionHistoryBuilder(
                 TransactionType.WITHDRAW,
@@ -73,11 +74,16 @@ public class TransactionService {
 
     public void executeTransfer(BankAccount fromBankAccount, BankAccount toBankAccount, final BigDecimal amount) {
         // validate parameters
-        Preconditions.checkNotNull(fromBankAccount, "fromBbankAccount can not be null");
-        Preconditions.checkNotNull(toBankAccount, "toBankAccount can not be null");
-        Preconditions.checkArgument(!Objects.equals(fromBankAccount.getId(), toBankAccount.getId()),
-                "Transfer can not executed an account to the same account. bankAccountId: ",
-                fromBankAccount.getId());
+        if (fromBankAccount == null) {
+            throw new IllegalArgumentException("fromBankAccount cannot be null");
+        }
+        if (toBankAccount == null) {
+            throw new IllegalArgumentException("toBankAccount cannot be null");
+        }
+        if (Objects.equals(fromBankAccount.getId(), toBankAccount.getId())) {
+            throw new IllegalArgumentException("Transfer cannot be executed to the same account. bankAccountId: " +
+                    fromBankAccount.getId());
+        }
 
         // create TransactionHistoryBuilder for fromBankAccount
         TransactionHistory.TransactionHistoryBuilder fromTransactionHistoryBuilder = getTransactionHistoryTransfer(
@@ -95,7 +101,7 @@ public class TransactionService {
                 amount);
 
         try {
-            validationService.validAmount(amount);
+           validationService.validateAmount(amount);
 
             takeMoney(fromTransactionHistoryBuilder, fromBankAccount, amount);
             putMoney(toTransactionHistoryBuilder, toBankAccount, amount);
@@ -115,15 +121,23 @@ public class TransactionService {
         }
     }
 
-    public void executeDeposit(BankAccount toBankAccount, BigDecimal amount) {
-        Preconditions.checkNotNull(toBankAccount, "bankAccount can not be null");
-        validationService.validAmount(amount);
 
+    public void executeDeposit(BankAccount toBankAccount, BigDecimal amount) {
+        // validate parameters
+        if (toBankAccount == null) {
+            throw new IllegalArgumentException("bankAccount cannot be null");
+        }
+
+        // validate amount
+       validationService.validateAmount(amount);
+
+        // create TransactionHistoryBuilder for deposit
         TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder = getTransactionHistoryBuilder(
                 TransactionType.DEPOSIT,
                 StatementType.INCOME,
                 toBankAccount,
                 amount);
+
         try {
             putMoney(transactionHistoryBuilder, toBankAccount, amount);
 
@@ -135,6 +149,7 @@ public class TransactionService {
             sendTransactionHistorySaveEvent(transactionHistoryBuilder, Optional.empty());
         }
     }
+
 
     private void takeMoney(TransactionHistory.TransactionHistoryBuilder transactionHistoryBuilder, BankAccount bankAccount, BigDecimal amount) {
         BigDecimal fee = transactionFeeService.getFee(TransactionType.WITHDRAW, bankAccount, amount);

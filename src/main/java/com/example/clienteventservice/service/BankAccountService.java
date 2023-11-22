@@ -3,12 +3,13 @@ package com.example.clienteventservice.service;
 import com.example.clienteventservice.domain.dto.UserDtoClient;
 import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.event.SBAEventListener;
+import com.example.clienteventservice.exception.BadRequestException;
 import com.example.clienteventservice.exception.BankAccountManagerException;
 import com.example.clienteventservice.exception.NotFoundException;
 import com.example.clienteventservice.repository.BankAccountRepository;
 import com.example.clienteventservice.domain.dto.BankAccountDto;
 import com.example.clienteventservice.domain.model.BankAccount;
-import com.google.common.base.Preconditions;
+import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
@@ -39,48 +40,26 @@ public class BankAccountService {
     private final UserService userService;
 
 
+
     public ApiResponse<BankAccount> addBankAccount(UUID customerId, BankAccountDto bankAccountDto) {
         try {
-            Preconditions.checkNotNull(bankAccountDto, "bankAccount can not be null");
-            Preconditions.checkArgument(
-                    bankAccountDto.getAccountNumber().matches("\\d{10}"),
-                    "Bank AccountNumber must be 10 digits"
-            );
-
-            if (bankAccountRepository.existsByAccountNumber(bankAccountDto.getAccountNumber())) {
-                throw new IllegalArgumentException("Bank Account Number already exists");
-            }
-
-            Preconditions.checkNotNull(bankAccountDto.getBalance(), "currentBalance can not be null");
-            Preconditions.checkArgument(
-                    bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) > -1 && bankAccountDto.getBalance().compareTo(new BigDecimal("5")) >= 0,
-                    "CurrentBalance must be non-negative and at least $5"
-            );
-
-            if (bankAccountRepository.existsByCustomerId(customerId)) {
-                throw new IllegalArgumentException("Customer with ID already has a bank account");
-            }
+            validateBankAccountDto(bankAccountDto);
+            validateUniqueAccountNumber(bankAccountDto.getAccountNumber());
+            validateBalance(bankAccountDto.getBalance());
+            validateUniqueCustomerId(customerId);
 
             ApiResponse<UserDtoClient> userDtoClient = userService.getById(customerId);
+            validateUserDtoClient(userDtoClient);
 
-            if (userDtoClient.getPayload() == null) {
-                throw new NotFoundException("User not found with ID: " + customerId);
-            }
-
-            System.out.println("userId in table: " + userDtoClient.getPayload().getId());
-
-            BankAccount bankAccount = bankAccountDto.toEntity();
-            bankAccount.setCustomerId(userDtoClient.getPayload().getId());
-
+            BankAccount bankAccount = createBankAccountFromDto(bankAccountDto, userDtoClient);
             BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
-            LOG.info("A bank account saved for customer: {}", userDtoClient.getPayload().getId());
 
             return ApiResponse.<BankAccount>builder()
                     .message("Bank account created successfully")
                     .status(HttpStatus.CREATED.value())
                     .payload(savedBankAccount)
                     .build();
-        } catch (NotFoundException | IllegalArgumentException e) {
+        } catch (ValidationException | NotFoundException e) {
             return ApiResponse.<BankAccount>builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST.value())
@@ -93,10 +72,57 @@ public class BankAccountService {
         }
     }
 
+    private void validateBankAccountDto(BankAccountDto bankAccountDto) {
+        if (bankAccountDto == null) {
+            throw new ValidationException("Bank account cannot be null");
+        }
+        if (!bankAccountDto.getAccountNumber().matches("\\d{10}")) {
+            throw new ValidationException("Bank Account Number must be 10 digits");
+        }
+        if (bankAccountDto.getBalance() == null || bankAccountDto.getBalance().compareTo(BigDecimal.ZERO) < 0 ||
+                bankAccountDto.getBalance().compareTo(new BigDecimal("5")) < 0) {
+            throw new ValidationException("CurrentBalance must be non-negative and at least $5");
+        }
+    }
+
+    private void validateUniqueAccountNumber(String accountNumber) {
+        if (bankAccountRepository.existsByAccountNumber(accountNumber)) {
+            throw new ValidationException("Bank Account Number already exists");
+        }
+    }
+
+    private void validateBalance(BigDecimal balance) {
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0 || balance.compareTo(new BigDecimal("5")) < 0) {
+            throw new ValidationException("CurrentBalance must be non-negative and at least $5");
+        }
+    }
+
+    private void validateUniqueCustomerId(UUID customerId) {
+        if (bankAccountRepository.existsByCustomerId(customerId)) {
+            throw new ValidationException("Customer with ID already has a bank account");
+        }
+    }
+
+    private void validateUserDtoClient(ApiResponse<UserDtoClient> userDtoClient) {
+        if (userDtoClient.getPayload() == null) {
+            throw new NotFoundException("User not found with specified ID");
+        }
+    }
+
+    private BankAccount createBankAccountFromDto(BankAccountDto bankAccountDto, ApiResponse<UserDtoClient> userDtoClient) {
+        BankAccount bankAccount = bankAccountDto.toEntity();
+        bankAccount.setCustomerId(userDtoClient.getPayload().getId());
+        return bankAccount;
+    }
+
+
 
     public ApiResponse<BankAccount> getBankAccount(String bankAccountNumber) {
         try {
-            Preconditions.checkNotNull(bankAccountNumber, MESSAGE_FORMAT_NO_BANK_ACCOUNT, bankAccountNumber);
+
+            if (bankAccountNumber == null) {
+                throw new IllegalArgumentException("bankAccountNumber cannot be null");
+            }
 
             Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByAccountNumber(bankAccountNumber);
 
@@ -174,7 +200,9 @@ public class BankAccountService {
 
     public ApiResponse<BankAccount> getBankAccountByUserId(UUID userId) {
         try {
-            Preconditions.checkNotNull(userId, MESSAGE_FORMAT_NO_BANK_ACCOUNT, userId);
+            if (userId == null) {
+                throw new IllegalArgumentException("userId cannot be null");
+            }
 
             Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByCustomerId(userId);
 
