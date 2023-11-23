@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
 import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,5 +36,17 @@ public class ClientEventServiceApplication {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+    // Inject the KafkaProducerService and send a test message
+//    @Bean
+//    public CommandLineRunner run(KafkaProducerService kafkaProducerService) {
+//        return args -> {
+//            // Create a test message
+//            KafkaMessage testMessage = new KafkaMessage("Hello, Kafka!");
+//
+//            // Send the test message to the Kafka topic
+//            kafkaProducerService.sendMessage(testMessage);
+//        };
+//    }
 
 }

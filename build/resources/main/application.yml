@@ -1,18 +1,32 @@
 server:
   port: 8088
 baseUrl: http://localhost:${server.port}
+#
+#spring:
+#
+#  application:
+#    name: client-event-service
+#
+#  kafka:
+#    producer:
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      bootstrap-servers: 47.236.10.166:30292
+#    dead_letter_topic: notification-retry
 
 spring:
 
   application:
     name: client-event-service
-
   kafka:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: 47.236.10.166:30292
+    template:
+      default-topic: test-topic
     dead_letter_topic: notification-retry
+
 
   mail:
     properties:
@@ -29,12 +43,12 @@ spring:
           jwk-set-uri: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/certs
 
   datasource:
-#    url: jdbc:postgresql://8.219.131.180:8765/fintrack
-#    username: root
-#    password: P@SSWORD666
-    url: jdbc:postgresql://localhost:33007/mini_project_db
-    username: my_user
-    password: my_password
+    url: jdbc:postgresql://8.219.131.180:8765/fintrack
+    username: root
+    password: P@SSWORD666
+#    url: jdbc:postgresql://localhost:33007/mini_project_db
+#    username: my_user
+#    password: my_password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -89,3 +103,8 @@ ExpiredPage:
 #    path: /client-event-service/v3/api-docs #these urls will used to load the swagger ui of this service by the api gateway
 #  swagger-ui:
 #    path: /client-event-service/swagger-ui.html
+
+kafka:
+  group-id: notification-consumer
+  auto-offset: earliest
+
