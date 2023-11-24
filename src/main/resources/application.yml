@@ -66,9 +66,9 @@ keycloak:
   auth-server-url: https://keycloak-fintrack.sythorng.site/auth/ #docker container
   credentials:
     username: 'admin'
-    password: 'admin'
+    password: 'admin123'
     client-id: 'client-app' # admin account for creating users
-    secret: 'fdakufDNpefxzc7oaGHugg4UcL6jmSAy'
+    secret: 'T4BXIUbFPVlX4Zu3DTI44GsbqWtxox4D'
 
   grant-type: password
   tokenUrl: https://keycloak-fintrack.sythorng.site/auth/realms/USER_SERVICE/protocol/openid-connect/token
