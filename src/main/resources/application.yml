@@ -1,6 +1,6 @@
 server:
   port: 8088
-baseUrl: http://localhost:${server.port}
+baseUrl: https://api-fintrack.kbaenak.tech/fintrack-client-event-service/api/v1
 #
 #spring:
 #
@@ -84,14 +84,14 @@ spring.servlet:
     maxFileSize: 20000MB
     maxRequestSize: 20000MB
 image:
-  url: ${baseUrl}/api/v1/file/get-image?file=
+  url: ${baseUrl}/file/get-image?file=
 
 telegram:
   url: http://localhost:8082/api/v1/telegram
 
 #for link verify email that get from angular
 LoginPage:
-  url: http://localhost:4200/api/v1/login-page
+  url: https://web.seiha.lol/login
 forgetPasswordPage:
   url: http://localhost:4200/api/v1/forget-password
 ExpiredPage:

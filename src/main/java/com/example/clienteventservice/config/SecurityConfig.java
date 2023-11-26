@@ -26,6 +26,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers("/fintrack-client-event-service/api/v1/clients/**").permitAll()
+                        .requestMatchers("fintrack-web-push-service/api/v1/**").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/fintrack-client-event-service/api/v1/clients/").authenticated()
                         .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/api/v1/clients/").authenticated()
                         .requestMatchers("/fintrack-client-event-service/api/v1/file/clients/**").permitAll()
