@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/fintrack-client-event-service/api/v1/customers")
+@RequestMapping("/api/v1/customers")
 @AllArgsConstructor
 public class CustomerController {
 

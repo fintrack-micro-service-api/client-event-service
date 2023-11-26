@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor(onConstructor_ = {@Autowired})
 @RestController
-@RequestMapping("/fintrack-client-event-service/api/v1/transaction")
+@RequestMapping("/api/v1/transaction")
 public class TransactionController {
     private static final Logger LOG = LogManager.getLogger(TransactionController.class);
     private DepositService depositService;
