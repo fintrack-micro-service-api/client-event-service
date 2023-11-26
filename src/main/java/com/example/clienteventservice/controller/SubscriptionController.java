@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin
-@RequestMapping("api/v1/clients")
+@RequestMapping("/fintrack-client-event-service/api/v1/clients")
 @AllArgsConstructor
 public class SubscriptionController {
 

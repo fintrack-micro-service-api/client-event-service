@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
-@RequestMapping("/api/v1/auth/clients")
+@RequestMapping("/fintrack-client-event-service/api/v1/auth/clients")
 public class AuthController {
     private final UserService userService;
 

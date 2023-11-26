@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/file/clients")
+@RequestMapping("/fintrack-client-event-service/api/v1/file/clients")
 public class FileStorageRestController {
     private final FileUploadService imageService;
 

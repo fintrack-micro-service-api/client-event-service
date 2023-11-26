@@ -31,7 +31,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/api/v1/clients/").authenticated()
                         .requestMatchers("/fintrack-client-event-service/api/v1/file/clients/**").permitAll()
                         .requestMatchers(
-                                "/fintrack-client-event-service/api/v1/auth/clients/**",
                                 "/fintrack-client-event-service/api/v1/bank/**",
                                 "/fintrack-client-event-service/api/v1/customers/**",
                                 "/fintrack-client-event-service/api/v1/transaction/**"

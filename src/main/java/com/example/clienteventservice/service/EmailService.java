@@ -31,7 +31,7 @@ public class EmailService{
                 = javaMailSender.createMimeMessage();
         try {
 
-            String url=baseUrl+"/api/v1/auth/clients/verify-email?email="+email+"&type=";
+            String url=baseUrl+"/auth/clients/verify-email?email="+email+"&type=";
 
             String subject =
                     "Email Verification";

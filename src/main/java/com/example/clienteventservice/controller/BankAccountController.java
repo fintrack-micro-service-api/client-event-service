@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequestMapping(BankAccountController.SERVICE_PATH)
 public class BankAccountController {
 
-    public static final String SERVICE_PATH = "api/v1/bank/";
+    public static final String SERVICE_PATH = "/fintrack-client-event-service/api/v1/bank/";
     public static final String METHOD_GET_BALANCE = "/balance";
     private static final String METHOD_GET_BALANCE_WITH_PARAM = "/balance/{bankAccountNumber}";
     public static final String METHOD_GET_BALANCE_ALL = "/balance/all";
