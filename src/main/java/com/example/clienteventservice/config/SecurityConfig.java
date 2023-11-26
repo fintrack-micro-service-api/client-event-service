@@ -25,15 +25,15 @@ public class SecurityConfig {
                 csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorize ->
                 authorize
-                        .requestMatchers("/api/v1/clients/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/api/v1/clients/").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/clients/").authenticated()
-                        .requestMatchers("/api/v1/file/clients/**").permitAll()
+                        .requestMatchers("/fintrack-client-event-service/api/v1/clients/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/fintrack-client-event-service/api/v1/clients/").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/api/v1/clients/").authenticated()
+                        .requestMatchers("/fintrack-client-event-service/api/v1/file/clients/**").permitAll()
                         .requestMatchers(
-                                "/api/v1/auth/clients/**",
-                                "/api/v1/bank/**",
-                                "/api/v1/customers/**",
-                                "/api/v1/transaction/**"
+                                "/fintrack-client-event-service/api/v1/auth/clients/**",
+                                "/fintrack-client-event-service/api/v1/bank/**",
+                                "/fintrack-client-event-service/api/v1/customers/**",
+                                "/fintrack-client-event-service/api/v1/transaction/**"
                         ).permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
