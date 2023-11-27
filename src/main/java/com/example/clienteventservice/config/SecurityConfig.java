@@ -25,17 +25,17 @@ public class SecurityConfig {
                 csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorize ->
                 authorize
-                        .requestMatchers("/fintrack-client-event-service/api/v1/clients/**").permitAll()
-                        .requestMatchers("fintrack-web-push-service/api/v1/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT,"/fintrack-client-event-service/api/v1/clients/").authenticated()
-                        .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/api/v1/clients/").authenticated()
+                        .requestMatchers("/fintrack-client-event-service/fintrack-client-event-service/api/v1/clients/**").permitAll()
+                        .requestMatchers("fintrack-web-push-service/fintrack-client-event-service/api/v1/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/fintrack-client-event-service/fintrack-client-event-service/api/v1/clients/").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/fintrack-client-event-service/api/v1/clients/").authenticated()
                         .requestMatchers(
                                 "/fintrack-client-event-service/fintrack-client-event-service/api/v1/file/clients/**",
                                 "/fintrack-client-event-service/api/v1/file/clients/**",
                                 "/api/v1/auth/clients/**",
-                                "/fintrack-client-event-service/api/v1/bank/**",
-                                "/fintrack-client-event-service/api/v1/customers/**",
-                                "/fintrack-client-event-service/api/v1/transaction/**",
+                                "/fintrack-client-event-service/fintrack-client-event-service/api/v1/bank/**",
+                                "/fintrack-client-event-service/fintrack-client-event-service/api/v1/customers/**",
+                                "/fintrack-client-event-service/fintrack-client-event-service/api/v1/transaction/**",
                                 "/api/v1/transaction/**"
 
                         ).permitAll()
