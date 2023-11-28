@@ -21,7 +21,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilter(HttpSecurity http) throws Exception {
 
-        http.
+        http.cors().and().
                 csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorize ->
                 authorize
@@ -31,12 +31,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,"/fintrack-client-event-service/api/v1/clients/").authenticated()
                         .requestMatchers(
                                 "/fintrack-client-event-service/api/v1/file/clients/**",
+//                                "/fintrack-client-event-service/api/v1/bank/balance/all",
                                 "/fintrack-client-event-service/api/v1/file/clients/**",
                                 "/api/v1/auth/clients/**",
                                 "/fintrack-client-event-service/api/v1/bank/**",
                                 "/fintrack-client-event-service/api/v1/customers/**",
                                 "/fintrack-client-event-service/api/v1/transaction/**",
-                                "/api/v1/transaction/**"
+                                "/api/v1/transaction/**",
+                                "/api/v1/bank/**"
 
                         ).permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
