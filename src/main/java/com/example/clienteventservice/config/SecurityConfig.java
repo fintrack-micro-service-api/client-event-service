@@ -38,7 +38,9 @@ public class SecurityConfig {
                                 "/fintrack-client-event-service/api/v1/customers/**",
                                 "/fintrack-client-event-service/api/v1/transaction/**",
                                 "/api/v1/transaction/**",
-                                "/api/v1/bank/**"
+                                "/api/v1/bank/**",
+                                "/api/v1/customers/**"
+
 
                         ).permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

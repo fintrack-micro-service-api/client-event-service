@@ -23,8 +23,8 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       bootstrap-servers: 47.236.10.166:30292
-    template:
-      default-topic: test-topic
+#    template:
+#      default-topic: test-topic
     dead_letter_topic: notification-retry
 
 
