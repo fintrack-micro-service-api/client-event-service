@@ -283,6 +283,8 @@ public class UserService {
         newUser.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         newUser.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         newUser.singleAttribute("isVerify", isVerify);
+        newUser.singleAttribute("phoneNumber", "0987467365");
+
         if (type.equals("2")) {
             newUser.singleAttribute("isForget", isForget);
             newUser.singleAttribute("forget_createAt", String.valueOf(LocalDateTime.now()));
