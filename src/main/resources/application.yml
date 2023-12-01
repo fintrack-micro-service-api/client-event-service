@@ -1,6 +1,6 @@
 server:
   port: 8088
-baseUrl: https://api-fintrack.kbaenak.tech/fintrack-client-event-service/api/v1
+baseUrl: https://api.fintrack.dev/fintrack-client-event-service/api/v1
 #
 #spring:
 #
