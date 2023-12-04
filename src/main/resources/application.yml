@@ -93,9 +93,9 @@ telegram:
 LoginPage:
   url: https://web.seiha.lol/login
 forgetPasswordPage:
-  url: http://localhost:4200/api/v1/forget-password
+  url: https://web.seiha.lol/forget-password
 ExpiredPage:
-  url: http://localhost:4200/api/v1/expired-page
+  url: https://web.seiha.lol/expired-page
 
 
 #springdoc:
