@@ -27,12 +27,11 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        try{
-        return ResponseEntity.ok().body(userService.login(loginRequest));
+        try {
+            return ResponseEntity.ok().body(userService.login(loginRequest));
 
-        }catch (BadRequestException e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-
         }
     }
 

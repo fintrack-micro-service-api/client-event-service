@@ -1,5 +1,6 @@
 package com.example.clienteventservice.service;
 
+import com.example.clienteventservice.domain.dto.UserDto;
 import com.example.clienteventservice.domain.dto.UserDtoClient;
 import com.example.clienteventservice.domain.response.ApiResponse;
 import com.example.clienteventservice.domain.response.LoginResponse;
@@ -74,7 +75,8 @@ public class UserService {
     private final WebClient.Builder webClient;
     private final EmailService emailService;
     private final RestTemplate restTemplate;
-    private final Keycloak keycloak;;
+    private final Keycloak keycloak;
+    ;
     private final SubscriptionRepository subscriptionRepository;
 
     public UserService(WebClient.Builder webClient, EmailService emailService, RestTemplate restTemplate, Keycloak keycloak, SubscriptionRepository subscriptionRepository) {
@@ -91,16 +93,23 @@ public class UserService {
                 .defaultHeaders(httpHeaders -> httpHeaders.setBearerAuth(jwt.getTokenValue()))
                 .build()
                 .post()
-                .uri("?message="+message)
+                .uri("?message=" + message)
                 .retrieve()
                 .bodyToMono(ApiResponse.class).block();
     }
 
     public ApiResponse<LoginResponse> login(LoginRequest loginrequest) {
-        UserRepresentation userRepresentation = getUserRepresentationByEmail(loginrequest.getEmail());
-        if (!Boolean.parseBoolean(userRepresentation.getAttributes().get("isVerify").get(0))) {
-            throw new BadRequestException("user not yet verify code yet");
+        try {
+            UserRepresentation userRepresentation = getUserRepresentationByEmail(loginrequest.getEmail());
+
+            if (!Boolean.parseBoolean(userRepresentation.getAttributes().get("isVerify").get(0))) {
+                throw new BadRequestException("user not yet verify code yet");
+            }
+
+        } catch (Exception e) {
+            throw new NotFoundException(e.getMessage());
         }
+
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -113,7 +122,8 @@ public class UserService {
             map.add("password", loginrequest.getPassword());
 
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
-            LoginResponse loginResponse =  restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody();
+            LoginResponse loginResponse = restTemplate.postForEntity(tokenUrl, httpEntity, LoginResponse.class).getBody();
+            System.out.println("loginResponse: " + loginResponse);
 
             return ApiResponse.<LoginResponse>builder()
                     .message("login success...!!")
@@ -154,7 +164,19 @@ public class UserService {
         }
     }
 
-    public ApiResponse<?> create(UserRequest userRequest) {
+    public ApiResponse<UserDtoClient> create(UserRequest userRequest) {
+
+        List<UserRepresentation> userRepresentation1 = keycloak.realm(realm).users().searchByEmail(userRequest.getEmail(), true);
+        if (!userRepresentation1.isEmpty()) {
+            if (!Boolean.parseBoolean(userRepresentation1.get(0).getAttributes().get("isVerify").get(0))) {
+                generateLinkVerifyEmail(userRequest.getEmail(), "false", 1, "false");
+            }
+            return ApiResponse.<UserDtoClient>builder()
+                    .message("register success..!")
+                    .payload(getByEmail(userRequest.getEmail()).getPayload())
+                    .status(200)
+                    .build();
+        }
 
         if (userRequest.getUsername().isEmpty() || userRequest.getUsername().isBlank()) {
             throw new BadRequestException(
@@ -192,7 +214,6 @@ public class UserService {
                 .status(200)
                 .build();
     }
-
 
 
     private CredentialRepresentation preparePasswordRepresentation(String password) {
@@ -238,7 +259,7 @@ public class UserService {
         return userRepresentation;
     }
 
-    public UserRepresentation prepareUserRepresentationForUpdate(UserRepresentation userRequest, String isVerify, String isForget, int index) {
+    public UserRepresentation prepareUserRepresentationForUpdate(UserRepresentation userRequest, String isVerify, String isForget, int index, String phoneNumber) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setUsername(userRequest.getUsername());
         userRepresentation.setEmail(userRequest.getEmail());
@@ -246,7 +267,7 @@ public class UserService {
         userRepresentation.singleAttribute("createdDate", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("lastModified", String.valueOf(LocalDateTime.now()));
         userRepresentation.singleAttribute("profile", "DefaultProfile.jpeg");
-
+        userRepresentation.singleAttribute("phoneNumber", phoneNumber);
         userRepresentation.singleAttribute("isVerify", isVerify);
 
         if (index == 2) {
@@ -325,7 +346,7 @@ public class UserService {
     public UserRepresentation getUserRepresentationByEmail(String email) {
         List<UserRepresentation> users = keycloak.realm(realm).users().searchByEmail(email, true);
         if (users.isEmpty()) {
-            throw new NotFoundException("email : " + email + " is not found..!!");
+            throw new NotFoundException("This email is not register yet!!");
         }
         return users.get(0);
     }
@@ -424,8 +445,9 @@ public class UserService {
     }
 
     public ApiResponse<?> generateLinkVerifyEmail(String email, String isVerify, Integer index, String isForget) {
-        UserRepresentation user = getUserRepresentationByEmail(email.trim());
-        UserRepresentation userRepresentation = prepareUserRepresentationForUpdate(user, isVerify, isForget, index);
+        UserRepresentation user = getUserRepresentationByEmail(email);
+        ApiResponse<UserDtoClient> getUserByEmail = getByEmail(email);
+        UserRepresentation userRepresentation = prepareUserRepresentationForUpdate(user, isVerify, isForget, index, getUserByEmail.getPayload().getPhoneNumber());
         UsersResource userResource = keycloak.realm(realm).users();
         userResource.get(user.getId()).update(userRepresentation);
         emailService.sendSimpleMail(user.getUsername(), user.getEmail(), index);
@@ -442,6 +464,7 @@ public class UserService {
             throw new NotFoundException("user id : " + id + " is not found");
         }
     }
+
     public ApiResponse<UserDtoClient> getById(UUID id) {
         try {
             UserDtoClient userDto = User.toDto(getUserRepresentationById(id), url);
@@ -503,14 +526,13 @@ public class UserService {
     }
 
 
-
-    public ApiResponse<?> updateById( ProfileRequest userRequest, Principal principal,Jwt jwt) {
-        if (principal==null){
+    public ApiResponse<?> updateById(ProfileRequest userRequest, Principal principal, Jwt jwt) {
+        if (principal == null) {
             throw new ForbiddenException("need token");
         }
         try {
-             User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
-        }catch (Exception e){
+            User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url);
+        } catch (Exception e) {
             throw new ForbiddenException("user need to login");
         }
 
@@ -532,14 +554,13 @@ public class UserService {
             UserRepresentation userRepresentation = prepareUserRepresentationForProfile(user, userRequest);
             UsersResource userResource = keycloak.realm(realm).users();
             userResource.get(user.getId()).update(userRepresentation);
-            sendMessage("you have been update your information already",jwt);
+            sendMessage("you have been update your information already", jwt);
             return ApiResponse.builder()
                     .message("update user by id success")
                     .payload(User.toDto(getUserRepresentationById(UUID.fromString(principal.getName())), url))
                     .status(200)
                     .build();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new BadRequestException("username already exist");
         }
     }
@@ -576,8 +597,6 @@ public class UserService {
 //            e.printStackTrace();
 //        }
 //    }
-
-
 
 
 //    private void sendNotificationToKafka(String userId, String message) {
