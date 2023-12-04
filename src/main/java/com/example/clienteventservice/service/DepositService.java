@@ -53,7 +53,7 @@ public class DepositService {
             kafkaTemplate.send(message);
 
             return ApiResponse.<Void>builder()
-                    .message("Deposit successful")
+                    .message("Deposit successfully")
                     .status(HttpStatus.OK.value())
                     .build();
         } catch (IllegalArgumentException e) {

@@ -60,7 +60,7 @@ public class WithdrawService {
             kafkaTemplate.send(message);
 
             return ApiResponse.<Void>builder()
-                    .message("Withdrawal successful")
+                    .message("Withdraw successfully")
                     .status(HttpStatus.OK.value())
                     .build();
         } catch (IllegalArgumentException e) {

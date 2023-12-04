@@ -74,7 +74,7 @@ public class TransferService {
             sendTransactionNotification(receiverResponse);
 
             return ApiResponse.<Void>builder()
-                    .message("Transfer successful")
+                    .message("Transfer successfully")
                     .status(HttpStatus.OK.value())
                     .build();
         } catch (IllegalArgumentException e) {

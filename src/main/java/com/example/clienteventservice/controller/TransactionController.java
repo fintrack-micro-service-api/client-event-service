@@ -42,7 +42,7 @@ public class TransactionController {
         ApiResponse<Void> withdrawResponse = withdrawService.withdraw(bankAccountNumber, amountDto.getAmount());
 
         return ResponseEntity.status(withdrawResponse.getStatus())
-                .body(new ApiResponse<>("Withdraw " + withdrawResponse.getMessage(), withdrawResponse.getStatus()));
+                .body(new ApiResponse<>(withdrawResponse.getMessage(), withdrawResponse.getStatus()));
     }
 
     @ApiOperation(value = "Transfer money from an account to other account")
@@ -58,7 +58,7 @@ public class TransactionController {
         ApiResponse<Void> transferResponse = transferService.transfer(fromBankAccountNumber, toBankAccountNumber, amountDto.getAmount());
 
         return ResponseEntity.status(transferResponse.getStatus())
-                .body(new ApiResponse<>("Transfer " + transferResponse.getMessage(), transferResponse.getStatus()));
+                .body(new ApiResponse<>(transferResponse.getMessage(), transferResponse.getStatus()));
     }
 
     @ApiOperation(value = "Deposit the money")
@@ -72,7 +72,7 @@ public class TransactionController {
         ApiResponse<Void> depositResponse = depositService.deposit(accountNumber, amountDto.getAmount());
 
         return ResponseEntity.status(depositResponse.getStatus())
-                .body(new ApiResponse<>("Deposit " + depositResponse.getMessage(), depositResponse.getStatus()));
+                .body(new ApiResponse<>(depositResponse.getMessage(), depositResponse.getStatus()));
     }
 
     @ApiOperation(value = "Get transaction history")
