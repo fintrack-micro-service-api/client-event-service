@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/fintrack-client-event-service/api/v1/file/clients/**",
 //                                "/fintrack-client-event-service/api/v1/bank/balance/all",
-                                "/fintrack-client-event-service/api/v1/file/clients/**",
+                                "/fintrack-client-event-service/api/v1/auth/clients/**",
                                 "/api/v1/auth/clients/**",
                                 "/fintrack-client-event-service/api/v1/bank/**",
                                 "/fintrack-client-event-service/api/v1/customers/**",
